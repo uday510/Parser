@@ -143,11 +143,11 @@ public class Main {
         try {
 
             // Swagger JSON file
-//            String swaggerJsonPath = "/Users/uday/Downloads/Temelio/swagger.json";
-//            String outputFilePath = "/Users/uday/Downloads/Temelio/output.java";
+            String swaggerJsonPath = "/Users/uday/Downloads/Temelio/swagger.json";
+            String outputFilePath = "/Users/uday/Downloads/Temelio/output.java";
 
-            String swaggerJsonPath = "/Users/uday/Downloads/Temelio/problem2-swagger.json";
-            String outputFilePath = "/Users/uday/Downloads/Temelio/output2.java";
+//            String swaggerJsonPath = "/Users/uday/Downloads/Temelio/problem2-swagger.json";
+//            String outputFilePath = "/Users/uday/Downloads/Temelio/output2.java";
 
             // Read Swagger JSON
             String swaggerJson = readSwaggerJson(swaggerJsonPath);
@@ -298,7 +298,7 @@ public class Main {
         };
         String[] classNames2 = {"Address", "Duration", "GrantSubmission", "Nonprofit"};
 
-        for (String className : classNames2) {
+        for (String className : classNames1) {
             generateClassModel(rootNode, className, javaModels);
         }
 
@@ -307,7 +307,6 @@ public class Main {
 
     private static void generateClassModel(JsonNode rootNode, String className, StringBuilder javaModels) {
         JsonNode definitionNode = rootNode.path("definitions").path(className);
-//        System.out.println(definitionNode);
 
         if (definitionNode.isMissingNode()) {
             System.err.println("Definition for class " + className + " not found.");
@@ -330,9 +329,6 @@ public class Main {
             String propertyType;
             if (propertyDetails.has("type")) {
                 propertyType = mapJsonSchemaTypeToJava(propertyDetails.path("type"));
-                if (Objects.equals(propertyName, "role")) {
-                    System.out.println("propertyName : " + propertyName  + " \n" + "propertyDetails :" + propertyDetails + " \n" + "propertyType :" + propertyType);
-                }
 
             } else if (propertyDetails.has("$ref")) {
                 // Handle the case where the property type is another class
