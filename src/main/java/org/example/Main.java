@@ -1,25 +1,25 @@
 package org.example;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.SQLOutput;
-import java.util.Arrays;
+import java.nio.file.Files;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 public class Main {
-
     public static void main(String[] args) {
         try {
+            // Swagger first JSON file path
+//            String swaggerJsonPath = "/Users/uday/Downloads/Temelio/swagger1.json";
+//            String outputFilePath = "/Users/uday/Downloads/Temelio/output1.java";
 
-            // Swagger JSON file
-//            String swaggerJsonPath = "/Users/uday/Downloads/Temelio/swagger.json";
-//            String outputFilePath = "/Users/uday/Downloads/Temelio/output.java";
-
-            String swaggerJsonPath = "/Users/uday/Downloads/Temelio/problem2-swagger.json";
+            // Swagger second JSON file path
+            String swaggerJsonPath = "/Users/uday/Downloads/Temelio/swagger2.json";
             String outputFilePath = "/Users/uday/Downloads/Temelio/output2.java";
 
             // Read Swagger JSON
@@ -39,11 +39,11 @@ public class Main {
     }
 
     private static String readSwaggerJson(String filePath) throws IOException {
-        return new String(java.nio.file.Files.readAllBytes(new File(filePath).toPath()));
+        return new String(Files.readAllBytes(new File(filePath).toPath()));
     }
 
     private static void writeToFile(String filePath, String content) throws IOException {
-        java.nio.file.Files.write(new File(filePath).toPath(), content.getBytes());
+        Files.write(new File(filePath).toPath(), content.getBytes());
     }
 
     private static String generateJavaModels(String swaggerJson) throws IOException {
@@ -53,8 +53,8 @@ public class Main {
         // Generate Java models for specified classes
         StringBuilder javaModels = new StringBuilder();
 
+        // for first swagger.json file
         String[] classNames1 = {
-                // List of class names
                 "Nonprofit", "Address", "FiscalSponsor", "NonprofitAdditionalInfo", "NonprofitIRSData", "NonprofitMetadata",
                 "OfacFlags", "OfacSdn", "PlaidData", "DeleteFileInfo", "Foundation", "FoundationUser", "NonprofitUser",
                 "PresignedFile", "UploadedFile", "UserFoundationRole", "UserNonprofitRole", "AppUser", "NylasSyncRequest",
@@ -169,6 +169,7 @@ public class Main {
                 "TaskSearchResponse", "TaskSearchQuery", "TaskComment", "BulkTaskSubmissionRequest", "UserBearer",
                 "GetNonprofitResult", "GetNonprofitMetadataResult", "GetNonprofitUserResult"
         };
+
         // for second swagger.json file
         String[] classNames2 = {"Address", "Duration", "GrantSubmission", "Nonprofit"};
 
@@ -372,10 +373,12 @@ public class Main {
     private static String capitalize(String s) {
         return Character.toUpperCase(s.charAt(0)) + s.substring(1);
     }
+
     private static String extractClassName(String s) {
         String[] tmp = s.split("/");
-        return tmp[tmp.length-1].substring(0, tmp[tmp.length-1].length()-1);
+        return tmp[tmp.length - 1].substring(0, tmp[tmp.length - 1].length() - 1);
     }
+
     private static String capitalizeFirstChar(String input) {
         if (input == null || input.isEmpty()) {
             // Handle null or empty strings
