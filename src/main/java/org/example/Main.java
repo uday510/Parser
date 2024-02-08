@@ -4,8 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLOutput;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
 
 public class Main {
 
@@ -256,12 +259,17 @@ public class Main {
             Map.Entry<String, JsonNode> property = propertiesConstructor.next();
             String propertyName = property.getKey();
             String propertyType;
+
             if (property.getValue().has("type")) {
                 propertyType = mapJsonSchemaTypeToJava(property.getValue().path("type"));
             } else {
-                propertyType = "Object"; // Default to Object if type is not found
+                if (property.getValue().has("$ref")) {
+                    propertyType = extractClassName(String.valueOf(property.getValue().path("$ref")));
+                } else {
+                    System.err.println(property.getValue());
+                    propertyType = "Object";
+                }
             }
-
             // Check if the property is an array
             if (property.getValue().has("items")) {
                 JsonNode itemsNode = property.getValue().path("items");
@@ -309,7 +317,11 @@ public class Main {
             if (property.getValue().has("type")) {
                 propertyType = mapJsonSchemaTypeToJava(property.getValue().path("type"));
             } else {
-                propertyType = "Object"; // Default to Object if type is not found
+                if (property.getValue().has("$ref")) {
+                    propertyType = extractClassName(String.valueOf(property.getValue().path("$ref")));
+                } else {
+                    propertyType = "Object";
+                }
             }
 
             // Check if the property is an array
@@ -323,6 +335,10 @@ public class Main {
                     // Handle array of primitive types
                     propertyType = "List<" + mapJsonSchemaTypeToJava(itemsNode.path("type")) + ">";
                 }
+            }
+
+            if (Objects.equals(propertyType, "Object")) {
+                propertyType = capitalizeFirstChar(propertyName);
             }
 
             // Generate getter
@@ -355,5 +371,18 @@ public class Main {
 
     private static String capitalize(String s) {
         return Character.toUpperCase(s.charAt(0)) + s.substring(1);
+    }
+    private static String extractClassName(String s) {
+        String[] tmp = s.split("/");
+        return tmp[tmp.length-1].substring(0, tmp[tmp.length-1].length()-1);
+    }
+    private static String capitalizeFirstChar(String input) {
+        if (input == null || input.isEmpty()) {
+            // Handle null or empty strings
+            return input;
+        }
+
+        // Convert the first character to uppercase and concatenate the rest of the string
+        return Character.toUpperCase(input.charAt(0)) + input.substring(1);
     }
 }
