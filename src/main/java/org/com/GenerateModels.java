@@ -16,12 +16,12 @@ public class GenerateModels {
     public static void main(String[] args) {
        try {
            // Swagger first JSON file path
-            String swaggerJsonPath = "/Users/uday/Downloads/Temelio/swagger1.json";
-            String outputFilePath = "/Users/uday/Downloads/Temelio/copilot.java";
+//            String swaggerJsonPath = "/Users/uday/Downloads/Temelio/swagger1.json";
+//            String outputFilePath = "/Users/uday/Downloads/Temelio/output1.java";
 
            // Swagger second JSON file path
-//           String swaggerJsonPath = "/Users/uday/Downloads/Temelio/swagger2.json";
-//           String outputFilePath = "/Users/uday/Downloads/Temelio/copilot.java";
+           String swaggerJsonPath = "/Users/uday/Downloads/Temelio/swagger2.json";
+           String outputFilePath = "/Users/uday/Downloads/Temelio/output2.java";
 
             // Read the swagger.json file and generate the models
             String swaggerJson = readSwaggerJson(swaggerJsonPath);
@@ -59,7 +59,7 @@ public class GenerateModels {
         StringBuilder models = new StringBuilder();
 
         // Get the classes from the swagger.json
-        String[] classNames = {
+        String[] classNames1 = {
                 "Nonprofit", "Address", "FiscalSponsor", "NonprofitAdditionalInfo", "NonprofitIRSData", "NonprofitMetadata",
                 "OfacFlags", "OfacSdn", "PlaidData", "DeleteFileInfo", "Foundation", "FoundationUser", "NonprofitUser",
                 "PresignedFile", "UploadedFile", "UserFoundationRole", "UserNonprofitRole", "AppUser", "NylasSyncRequest",
@@ -176,10 +176,10 @@ public class GenerateModels {
         };
 
         // for second swagger.json file
-//        String[] classNames2= {"Address", "Duration", "GrantSubmission", "Nonprofit"};
+        String[] classNames2 = {"Address", "Duration", "GrantSubmission", "Nonprofit"};
 
         // Generate models for each class
-        for (String className : classNames) {
+        for (String className : classNames2) {
             generateClassModels(jsonNode, className, models);
         }
 
@@ -260,11 +260,9 @@ public class GenerateModels {
         models.append("    }\n");
 
         // Generate getters and setters for each property
-
         properties = propertiesNode.fields();
 
         // Iterate through the properties
-
         while (properties.hasNext()) {
             Map.Entry<String, JsonNode> property = properties.next();
             String propertyName = property.getKey();
