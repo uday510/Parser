@@ -7,8 +7,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Iterator;
 import java.util.Map;
+
 public class GenerateModels {
     public static void main(String[] args) {
        try {
@@ -44,6 +47,7 @@ public class GenerateModels {
      * @throws IOException If there is an issue reading the file.
      */
     private static String readSwaggerJson(String filePath) throws IOException {
+        // Read the content of the JSON file and return it as a string
         return new String(Files.readAllBytes(new File(filePath).toPath()));
     }
 
@@ -172,11 +176,13 @@ public class GenerateModels {
         };
 
         // for second swagger.json file
-        String[] classNames2= {"Address", "Duration", "GrantSubmission", "Nonprofit"};
+//        String[] classNames2= {"Address", "Duration", "GrantSubmission", "Nonprofit"};
 
+        // Generate models for each class
         for (String className : classNames) {
             generateClassModels(jsonNode, className, models);
         }
+
         return models.toString();
     }
 
@@ -283,12 +289,7 @@ public class GenerateModels {
         // Close the class declaration
         models.append("}\n\n");
     }
-    /**
-     * Determines the type of the property based on the JSON schema.
-     *
-     * @param propertyDetails JSON node containing property details.
-     * @return The type of the property.
-     */
+
     /**
      * Determines the type of the property based on the JSON schema.
      *
@@ -385,11 +386,11 @@ public class GenerateModels {
     /**
      * Generates the enum declaration for a property and appends it to the StringBuilder.
      *
-     * @param models           StringBuilder to append the enum declaration.
-     * @param propertyName     Name of the enum property.
-     * @param propertyDetails  JSON node containing property details.
+     * @param models          StringBuilder to append the enum declaration.
+     * @param propertyName    Name of the enum property.
+     * @param propertyDetails JSON node containing property details.
      */
-    private static String generateEnumDeclaration(StringBuilder models, String propertyName, JsonNode propertyDetails) {
+    private static void generateEnumDeclaration(StringBuilder models, String propertyName, JsonNode propertyDetails) {
         // Handle the case where the property is an enum
         String enumType = capitalize(propertyName);
         models.append("    public enum ").append(enumType).append(" {\n");
@@ -404,11 +405,6 @@ public class GenerateModels {
 
         // change the propertyType to enumType
         models.append("    private ").append(enumType).append(" ").append(propertyName).append(";\n");
-
-        // make return type so it can be used in the constructor
-
-        return enumType;
-
     }
     /**
      * Maps JSON schema types to Java types.
@@ -443,8 +439,10 @@ public class GenerateModels {
      * @throws IOException If an I/O error occurs while writing to the file.
      */
     private static void writeToFile(String filePath, String content) throws IOException {
-        // Use Files.write to write content to the specified file path
-        Files.write(new File(filePath).toPath(), content.getBytes());
+        Path path = Paths.get(filePath);
+
+        // Write content to the specified file path
+        Files.write(path, content.getBytes());
     }
 
     /**
@@ -457,5 +455,4 @@ public class GenerateModels {
         // Capitalize the first letter using substring
         return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
-
 }
