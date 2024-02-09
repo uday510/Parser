@@ -3,6 +3,7 @@ package org.com;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,16 +13,17 @@ import java.nio.file.Paths;
 import java.util.Iterator;
 import java.util.Map;
 
-public class GenerateModels {
+public class Main {
     public static void main(String[] args) {
        try {
+
            // Swagger first JSON file path
-//            String swaggerJsonPath = "/Users/uday/Downloads/Temelio/swagger1.json";
-//            String outputFilePath = "/Users/uday/Downloads/Temelio/output1.java";
+            String swaggerJsonPath = "/Users/uday/Downloads/Temelio/swagger1.json";
+            String outputFilePath = "/Users/uday/Downloads/Temelio/output1.java";
 
            // Swagger second JSON file path
-           String swaggerJsonPath = "/Users/uday/Downloads/Temelio/swagger2.json";
-           String outputFilePath = "/Users/uday/Downloads/Temelio/output2.java";
+            swaggerJsonPath = "/Users/uday/Downloads/Temelio/swagger2.json";
+            outputFilePath = "/Users/uday/Downloads/Temelio/output2.java";
 
             // Read the swagger.json file and generate the models
             String swaggerJson = readSwaggerJson(swaggerJsonPath);
@@ -172,7 +174,8 @@ public class GenerateModels {
                 "FoundationSearchQuery", "NonprofitSearchEntity", "NonprofitSearchResponse", "NonprofitSearchQuery",
                 "UniversalSearchDocument", "UniversalSearchResponse", "UniversalSearchQuery", "FoundationSearchBarQuery",
                 "TaskSearchResponse", "TaskSearchQuery", "TaskComment", "BulkTaskSubmissionRequest", "UserBearer",
-                "GetNonprofitResult", "GetNonprofitMetadataResult", "GetNonprofitUserResult"
+                "GetNonprofitResult", "GetNonprofitMetadataResult", "GetNonprofitUserResult", "AnalyticsPaymentYOYData"
+                ,"PDFDocumentDisplay", "BoardGrantProposalAdditionalInfo"
         };
 
         // for second swagger.json file
@@ -206,6 +209,12 @@ public class GenerateModels {
         while (properties.hasNext()) {
             Map.Entry<String, JsonNode> property = properties.next();
             String propertyName = property.getKey();
+
+            // Check for reserved keywords ,
+            if (isReservedKeyword(propertyName)) {
+                propertyName = "_" + propertyName;
+            }
+
             JsonNode propertyDetails = property.getValue();
 
             // Determine the type of the property
@@ -219,6 +228,11 @@ public class GenerateModels {
         // Generate default constructor
         models.append("\n    public ").append(className).append("() {}\n");
 
+        // if class is empty then return
+        if (propertiesNode.isEmpty()) {
+            models.append("}\n\n");
+            return;
+        }
         // Generate constructor with all fields
         models.append("\n    public ").append(className).append("(");
 
@@ -228,6 +242,12 @@ public class GenerateModels {
         while (propertiesConstructor.hasNext()) {
             Map.Entry<String, JsonNode> property = propertiesConstructor.next();
             String propertyName = property.getKey();
+
+            // Check for reserved keywords ,
+            if (isReservedKeyword(propertyName)) {
+                propertyName = "_" + propertyName;
+            }
+
             JsonNode propertyDetails = property.getValue();
 
             // Determine the type of the property
@@ -252,6 +272,11 @@ public class GenerateModels {
             Map.Entry<String, JsonNode> property = propertiesConstructor.next();
             String propertyName = property.getKey();
 
+            // Check for reserved keywords ,
+            if (isReservedKeyword(propertyName)) {
+                propertyName = "_" + propertyName;
+            }
+
             // Generate the constructor body
             models.append("        this.").append(propertyName).append(" = ").append(propertyName).append(";\n");
         }
@@ -266,6 +291,12 @@ public class GenerateModels {
         while (properties.hasNext()) {
             Map.Entry<String, JsonNode> property = properties.next();
             String propertyName = property.getKey();
+
+            // Check for reserved keywords ,
+            if (isReservedKeyword(propertyName)) {
+                propertyName = "_" + propertyName;
+            }
+
             JsonNode propertyDetails = property.getValue();
 
             // Determine the type of the property
@@ -452,5 +483,18 @@ public class GenerateModels {
     private static String capitalize(String str) {
         // Capitalize the first letter using substring
         return str.substring(0, 1).toUpperCase() + str.substring(1);
+    }
+
+    /**
+     * Checks for reserved keywords in Java.
+     *
+     * @param str The input string to be checked.
+     * @return True if the string is a reserved keyword, false otherwise.
+     */
+    private static boolean isReservedKeyword(String str) {
+        // Check if the string is a reserved keyword
+        return str.equals("long") || str.equals("class")
+                || str.equals("synchronized")
+                || str.equals("default");
     }
 }
