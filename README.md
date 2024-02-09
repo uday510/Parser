@@ -27,14 +27,11 @@ It simplifies the process of creating Java classes based on your Swagger API def
     mvn clean install
     ```
 
+
+
 ## Usage
 
 To generate Java models from a Swagger JSON file, add the following dependency to your Maven project:
-
-
-## Contributing
-- [Uday](https://github.com/uday510)
-- [SamSi](https://github.com/Sam-Si)
 
 ```xml
 <dependency>
@@ -42,5 +39,13 @@ To generate Java models from a Swagger JSON file, add the following dependency t
     <artifactId>swagger-to-java-models</artifactId>
     <version>1.0.0</version> <!-- Replace with the actual version -->
 </dependency>
+```
 
+## Contributors
+- [Uday](https://github.com/uday510)
+- [SamSi](https://github.com/Sam-Si)
+- 
+## License
+
+This project is licensed under the Apache License, Version 2.0. See the [LICENSE](LICENSE) file for details.
 
