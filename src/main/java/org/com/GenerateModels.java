@@ -1,5 +1,6 @@
-package org.example;
+package org.com;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -7,54 +8,54 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-
-public class Main {
+public class GenerateModels {
     public static void main(String[] args) {
-        try {
-            // Swagger first JSON file path
-//            String swaggerJsonPath = "/Users/uday/Downloads/Temelio/swagger1.json";
-//            String outputFilePath = "/Users/uday/Downloads/Temelio/output1.java";
+       try {
+           // Swagger first JSON file path
+            String swaggerJsonPath = "/Users/uday/Downloads/Temelio/swagger1.json";
+            String outputFilePath = "/Users/uday/Downloads/Temelio/copilot.java";
 
-            // Swagger second JSON file path
-            String swaggerJsonPath = "/Users/uday/Downloads/Temelio/swagger2.json";
-            String outputFilePath = "/Users/uday/Downloads/Temelio/output2.java";
+           // Swagger second JSON file path
+//           String swaggerJsonPath = "/Users/uday/Downloads/Temelio/swagger2.json";
+//           String outputFilePath = "/Users/uday/Downloads/Temelio/copilot.java";
 
-            // Read Swagger JSON
+            // Read the swagger.json file and generate the models
             String swaggerJson = readSwaggerJson(swaggerJsonPath);
 
-            // Parse Swagger JSON and generate Java models
-            String javaModels = generateJavaModels(swaggerJson);
+            // Parse the swagger.json and generate the models
+            String models = generateJavaModels(swaggerJson);
 
-            // Write Java models to a file
-            writeToFile(outputFilePath, javaModels);
+            // Write the models to a file
+           writeToFile(outputFilePath, models);
 
-            System.out.println("Java models generated successfully.");
+           System.out.println("Models generated successfully");
 
-        } catch (IOException e) {
-            System.err.println("Error: " + e.getMessage());
-        }
+       } catch (IOException e) {
+           System.err.println("Error: " + e.getMessage());
+       }
+
     }
-
+    /**
+     * Reads the content of a JSON file and returns it as a string.
+     *
+     * @param filePath The path to the JSON file.
+     * @return The content of the JSON file as a string.
+     * @throws IOException If there is an issue reading the file.
+     */
     private static String readSwaggerJson(String filePath) throws IOException {
         return new String(Files.readAllBytes(new File(filePath).toPath()));
     }
 
-    private static void writeToFile(String filePath, String content) throws IOException {
-        Files.write(new File(filePath).toPath(), content.getBytes());
-    }
-
-    private static String generateJavaModels(String swaggerJson) throws IOException {
+    private static String generateJavaModels(String swaggerJson) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode rootNode = objectMapper.readTree(swaggerJson);
+        JsonNode jsonNode = objectMapper.readTree(swaggerJson);
 
-        // Generate Java models for specified classes
-        StringBuilder javaModels = new StringBuilder();
+        // Parse the swagger.json and generate the models
+        StringBuilder models = new StringBuilder();
 
-        // for first swagger.json file
-        String[] classNames1 = {
+        // Get the classes from the swagger.json
+        String[] classNames = {
                 "Nonprofit", "Address", "FiscalSponsor", "NonprofitAdditionalInfo", "NonprofitIRSData", "NonprofitMetadata",
                 "OfacFlags", "OfacSdn", "PlaidData", "DeleteFileInfo", "Foundation", "FoundationUser", "NonprofitUser",
                 "PresignedFile", "UploadedFile", "UserFoundationRole", "UserNonprofitRole", "AppUser", "NylasSyncRequest",
@@ -171,29 +172,92 @@ public class Main {
         };
 
         // for second swagger.json file
-        String[] classNames2 = {"Address", "Duration", "GrantSubmission", "Nonprofit"};
+        String[] classNames2= {"Address", "Duration", "GrantSubmission", "Nonprofit"};
 
-        for (String className : classNames2) {
-            generateClassModel(rootNode, className, javaModels);
+        for (String className : classNames) {
+            generateClassModels(jsonNode, className, models);
         }
-
-        return javaModels.toString();
+        return models.toString();
     }
 
-    private static void generateClassModel(JsonNode rootNode, String className, StringBuilder javaModels) {
-        JsonNode definitionNode = rootNode.path("definitions").path(className);
+    private static void generateClassModels(JsonNode jsonNode, String className, StringBuilder models) {
+        JsonNode definitionNode = jsonNode.get("definitions").path(className);
 
+        // Check if the definition for the class is missing
         if (definitionNode.isMissingNode()) {
-            System.err.println("Definition for class " + className + " not found.");
+            System.err.println("Definition for Class " + className + " not found");
             return;
         }
 
         // Generate class declaration
-        javaModels.append("public class ").append(className).append(" {\n");
+        models.append("public class ").append(className).append(" {\n");
 
         // Generate fields for each property
         JsonNode propertiesNode = definitionNode.path("properties");
         Iterator<Map.Entry<String, JsonNode>> properties = propertiesNode.fields();
+
+        // Iterate through the properties
+        while (properties.hasNext()) {
+            Map.Entry<String, JsonNode> property = properties.next();
+            String propertyName = property.getKey();
+            JsonNode propertyDetails = property.getValue();
+
+            // Determine the type of the property
+            String propertyType = determinePropertyType(propertyName, propertyDetails);
+
+            // Generate the field declaration
+            generateFieldDeclaration(models, propertyName, propertyType, propertyDetails);
+        }
+
+
+        // Generate default constructor
+        models.append("\n    public ").append(className).append("() {}\n");
+
+        // Generate constructor with all fields
+        models.append("\n    public ").append(className).append("(");
+
+        // Iterate through the properties
+        Iterator<Map.Entry<String, JsonNode>> propertiesConstructor = propertiesNode.fields();
+
+        while (propertiesConstructor.hasNext()) {
+            Map.Entry<String, JsonNode> property = propertiesConstructor.next();
+            String propertyName = property.getKey();
+            JsonNode propertyDetails = property.getValue();
+
+            // Determine the type of the property
+            String propertyType = determinePropertyType(propertyName, propertyDetails);
+
+            // Generate the constructor parameters
+            models.append(propertyType).append(" ").append(propertyName);
+
+            // Add a comma if there are more parameters
+            if (propertiesConstructor.hasNext()) {
+                models.append(", ");
+            }
+        }
+
+        // Close the constructor declaration
+        models.append(") {\n");
+
+        // Generate the constructor assignments
+        propertiesConstructor = propertiesNode.fields();
+
+        while (propertiesConstructor.hasNext()) {
+            Map.Entry<String, JsonNode> property = propertiesConstructor.next();
+            String propertyName = property.getKey();
+
+            // Generate the constructor body
+            models.append("        this.").append(propertyName).append(" = ").append(propertyName).append(";\n");
+        }
+
+        // Close the constructor declaration
+        models.append("    }\n");
+
+        // Generate getters and setters for each property
+
+        properties = propertiesNode.fields();
+
+        // Iterate through the properties
 
         while (properties.hasNext()) {
             Map.Entry<String, JsonNode> property = properties.next();
@@ -201,191 +265,197 @@ public class Main {
             JsonNode propertyDetails = property.getValue();
 
             // Determine the type of the property
-            String propertyType;
-            if (propertyDetails.has("type")) {
-                propertyType = mapJsonSchemaTypeToJava(propertyDetails.path("type"));
-
-            } else if (propertyDetails.has("$ref")) {
-                // Handle the case where the property type is another class
-                String ref = propertyDetails.path("$ref").asText();
-                propertyType = ref.substring(ref.lastIndexOf('/') + 1);
-            } else {
-                propertyType = "Object"; // Default to Object if type is not found
-            }
-
-            // Check if the property is an array
-            if (propertyDetails.has("items")) {
-                JsonNode itemsNode = propertyDetails.path("items");
-                if (itemsNode.has("$ref")) {
-                    // Handle the case where the array items are of another class
-                    String ref = itemsNode.path("$ref").asText();
-                    propertyType = "List<" + ref.substring(ref.lastIndexOf('/') + 1) + ">";
-                } else if (itemsNode.has("type")) {
-                    // Handle array of primitive types
-                    propertyType = "List<" + mapJsonSchemaTypeToJava(itemsNode.path("type")) + ">";
-                }
-            }
-
-            // Check if the property is an enum
-            boolean isEnumProperty = propertyDetails.has("enum");
-
-            // Generate field declaration
-            if (isEnumProperty) {
-                // Handle enum type
-                javaModels.append("    public enum ").append(propertyName).append(" {\n");
-
-                // Generate enum values
-                JsonNode enumValuesNode = propertyDetails.path("enum");
-                for (JsonNode enumValue : enumValuesNode) {
-                    javaModels.append("        ").append(enumValue.asText()).append(",\n");
-                }
-
-                // Close enum declaration
-                javaModels.append("    }\n");
-            } else {
-                // Generate regular field declaration
-                javaModels.append("    private ").append(propertyType).append(" ").append(propertyName).append(";\n");
-            }
-        }
-
-        // Generate default constructor
-        javaModels.append("\n    public ").append(className).append("() {\n    }\n");
-
-        // Generate parameterized constructor
-        javaModels.append("\n    public ").append(className).append("(");
-
-        Iterator<Map.Entry<String, JsonNode>> propertiesConstructor = propertiesNode.fields();
-
-        while (propertiesConstructor.hasNext()) {
-            Map.Entry<String, JsonNode> property = propertiesConstructor.next();
-            String propertyName = property.getKey();
-            String propertyType;
-
-            if (property.getValue().has("type")) {
-                propertyType = mapJsonSchemaTypeToJava(property.getValue().path("type"));
-            } else {
-                if (property.getValue().has("$ref")) {
-                    propertyType = extractClassName(String.valueOf(property.getValue().path("$ref")));
-                } else {
-                    System.err.println(property.getValue());
-                    propertyType = "Object";
-                }
-            }
-            // Check if the property is an array
-            if (property.getValue().has("items")) {
-                JsonNode itemsNode = property.getValue().path("items");
-                if (itemsNode.has("$ref")) {
-                    // Handle the case where the array items are of another class
-                    String ref = itemsNode.path("$ref").asText();
-                    propertyType = "List<" + ref.substring(ref.lastIndexOf('/') + 1) + ">";
-                } else if (itemsNode.has("type")) {
-                    // Handle array of primitive types
-                    propertyType = "List<" + mapJsonSchemaTypeToJava(itemsNode.path("type")) + ">";
-                }
-            }
-
-            // Generate constructor parameters
-            javaModels.append(propertyType).append(" ").append(propertyName);
-
-            if (propertiesConstructor.hasNext()) {
-                javaModels.append(", ");
-            }
-        }
-
-        javaModels.append(") {\n");
-
-        // Generate constructor assignments
-        propertiesConstructor = propertiesNode.fields();
-
-        while (propertiesConstructor.hasNext()) {
-            Map.Entry<String, JsonNode> property = propertiesConstructor.next();
-            String propertyName = property.getKey();
-
-            // Generate constructor assignments
-            javaModels.append("        this.").append(propertyName).append(" = ").append(propertyName).append(";\n");
-        }
-
-        // Close constructor
-        javaModels.append("    }\n");
-
-        // Generate getters and setters for each field
-        properties = propertiesNode.fields();
-
-        while (properties.hasNext()) {
-            Map.Entry<String, JsonNode> property = properties.next();
-            String propertyName = property.getKey();
-            String propertyType;
-            if (property.getValue().has("type")) {
-                propertyType = mapJsonSchemaTypeToJava(property.getValue().path("type"));
-            } else {
-                if (property.getValue().has("$ref")) {
-                    propertyType = extractClassName(String.valueOf(property.getValue().path("$ref")));
-                } else {
-                    propertyType = "Object";
-                }
-            }
-
-            // Check if the property is an array
-            if (property.getValue().has("items")) {
-                JsonNode itemsNode = property.getValue().path("items");
-                if (itemsNode.has("$ref")) {
-                    // Handle the case where the array items are of another class
-                    String ref = itemsNode.path("$ref").asText();
-                    propertyType = "List<" + ref.substring(ref.lastIndexOf('/') + 1) + ">";
-                } else if (itemsNode.has("type")) {
-                    // Handle array of primitive types
-                    propertyType = "List<" + mapJsonSchemaTypeToJava(itemsNode.path("type")) + ">";
-                }
-            }
-
-            if (Objects.equals(propertyType, "Object")) {
-                propertyType = capitalizeFirstChar(propertyName);
-            }
+            String propertyType = determinePropertyType(propertyName, propertyDetails);
 
             // Generate getter
-            javaModels.append("\n    public ").append(propertyType).append(" get").append(capitalize(propertyName)).append("() {\n")
+            models.append("\n    public ").append(propertyType).append(" get")
+                    .append(capitalize(propertyName)).append("() {\n")
                     .append("        return ").append(propertyName).append(";\n")
                     .append("    }\n");
 
             // Generate setter
-            javaModels.append("\n    public void set").append(capitalize(propertyName)).append("(").append(propertyType).append(" ").append(propertyName).append(") {\n")
+            models.append("\n    public void set").append(capitalize(propertyName))
+                    .append("(").append(propertyType).append(" ").append(propertyName).append(") {\n")
                     .append("        this.").append(propertyName).append(" = ").append(propertyName).append(";\n")
                     .append("    }\n");
         }
 
-        // Close class
-        javaModels.append("}\n\n");
+        // Close the class declaration
+        models.append("}\n\n");
+    }
+    /**
+     * Determines the type of the property based on the JSON schema.
+     *
+     * @param propertyDetails JSON node containing property details.
+     * @return The type of the property.
+     */
+    /**
+     * Determines the type of the property based on the JSON schema.
+     *
+     * @param propertyDetails JSON node containing property details.
+     * @return The type of the property.
+     */
+    private static String determinePropertyType(String propertyName, JsonNode propertyDetails) {
+        // Check if the property is a reference type
+        if (propertyDetails.has("$ref")) {
+            String ref = propertyDetails.get("$ref").asText();
+            return mapJsonSchemaTypeToJava(ref.substring(ref.lastIndexOf("/") + 1));
+        }
+
+        // Check if the property has a defined type
+        if (propertyDetails.has("type")) {
+            String propertyType = propertyDetails.get("type").asText();
+            propertyType = mapJsonSchemaTypeToJava(propertyType);
+
+            // Check for additional properties in the case of an Object type
+            if (propertyType.equals("Object") && propertyDetails.has("additionalProperties")) {
+                JsonNode additionalProperties = propertyDetails.get("additionalProperties");
+
+                // Check if additional properties are of a reference type
+                if (additionalProperties.has("$ref")) {
+                    String ref = additionalProperties.get("$ref").asText();
+                    return mapJsonSchemaTypeToJava(ref.substring(ref.lastIndexOf("/") + 1));
+                }
+            }
+
+            // Check if the property is an array
+            if (propertyType.equals("List") && propertyDetails.has("items")) {
+                JsonNode itemsNode = propertyDetails.path("items");
+
+                // Handle the case where the array items are of another class
+                if (itemsNode.has("$ref")) {
+                    String ref = itemsNode.get("$ref").asText();
+                    return "List<" + mapJsonSchemaTypeToJava(ref.substring(ref.lastIndexOf("/") + 1)) + ">";
+                } else if (itemsNode.has("type")) {
+                    // Handle the case where the array items are of a primitive type
+                    String itemType = itemsNode.get("type").asText();
+                    return "List<" + mapJsonSchemaTypeToJava(itemType) + ">";
+                }
+            }
+
+            // Check if the property is an enum
+            if (propertyDetails.has("enum")) {
+                return capitalize(propertyName);
+            }
+
+            return propertyType;
+        }
+
+        // Default to Object type if no type is specified
+        return "Object";
     }
 
-    private static String mapJsonSchemaTypeToJava(JsonNode typeNode) {
-        assert typeNode != null;
-        String type = typeNode.textValue();
-        return switch (type) {
+    /**
+     * Generates the field declaration for a property and appends it to the StringBuilder.
+     *
+     * @param models           StringBuilder to append the field declaration.
+     * @param propertyName     Name of the property.
+     * @param propertyType     Type of the property.
+     * @param propertyDetails  JSON node containing property details.
+     */
+    private static void generateFieldDeclaration(StringBuilder models, String propertyName, String propertyType, JsonNode propertyDetails) {
+        // Check for array type
+        if (propertyDetails.has("items")) {
+            JsonNode itemsNode = propertyDetails.path("items");
+
+            // Handle the case where the array items are of another class
+            if (itemsNode.has("$ref")) {
+                String ref = itemsNode.get("$ref").asText();
+                String type = mapJsonSchemaTypeToJava(ref.substring(ref.lastIndexOf("/") + 1));
+                propertyType = "List<" + type + ">";
+            } else {
+                // Handle the case where the array items are of a primitive type
+                String type = itemsNode.get("type").asText();
+                propertyType = "List<" + mapJsonSchemaTypeToJava(type) + ">";
+            }
+        }
+
+        // Check for enum type
+        boolean isEnumProperty = propertyDetails.has("enum");
+
+        // Generate the field declaration
+        if (isEnumProperty) {
+            // Handle the case where the property is an enum
+            generateEnumDeclaration(models, propertyName, propertyDetails);
+        } else {
+            // Handle the case where the property is not an enum
+            models.append("    private ").append(propertyType).append(" ").append(propertyName).append(";\n");
+        }
+    }
+    /**
+     * Generates the enum declaration for a property and appends it to the StringBuilder.
+     *
+     * @param models           StringBuilder to append the enum declaration.
+     * @param propertyName     Name of the enum property.
+     * @param propertyDetails  JSON node containing property details.
+     */
+    private static String generateEnumDeclaration(StringBuilder models, String propertyName, JsonNode propertyDetails) {
+        // Handle the case where the property is an enum
+        String enumType = capitalize(propertyName);
+        models.append("    public enum ").append(enumType).append(" {\n");
+
+        // Iterate through the enum values
+        for (JsonNode enumValue : propertyDetails.get("enum")) {
+            models.append("        ").append(enumValue.asText()).append(",\n");
+        }
+
+        // Close the enum declaration
+        models.append("    }\n");
+
+        // change the propertyType to enumType
+        models.append("    private ").append(enumType).append(" ").append(propertyName).append(";\n");
+
+        // make return type so it can be used in the constructor
+
+        return enumType;
+
+    }
+    /**
+     * Maps JSON schema types to Java types.
+     *
+     * @param str JSON schema type to be mapped.
+     * @return Corresponding Java type.
+     */
+    private static String mapJsonSchemaTypeToJava(String str) {
+        // Use switch expression to map JSON schema types to Java types
+        String javaType = switch (str) {
             case "string" -> "String";
             case "integer" -> "int";
             case "number" -> "double";
             case "boolean" -> "boolean";
             case "array" -> "List";
-            default -> "Object";
+            default -> str;
         };
-    }
 
-    private static String capitalize(String s) {
-        return Character.toUpperCase(s.charAt(0)) + s.substring(1);
-    }
-
-    private static String extractClassName(String s) {
-        String[] tmp = s.split("/");
-        return tmp[tmp.length - 1].substring(0, tmp[tmp.length - 1].length() - 1);
-    }
-
-    private static String capitalizeFirstChar(String input) {
-        if (input == null || input.isEmpty()) {
-            // Handle null or empty strings
-            return input;
+        // Special case for "object" type
+        if (str.equals("object")) {
+            return "Object";
         }
 
-        // Convert the first character to uppercase and concatenate the rest of the string
-        return Character.toUpperCase(input.charAt(0)) + input.substring(1);
+        return javaType;
     }
+
+    /**
+     * Writes content to a file at the specified filePath.
+     *
+     * @param filePath Path to the file where content should be written.
+     * @param content  Content to be written to the file.
+     * @throws IOException If an I/O error occurs while writing to the file.
+     */
+    private static void writeToFile(String filePath, String content) throws IOException {
+        // Use Files.write to write content to the specified file path
+        Files.write(new File(filePath).toPath(), content.getBytes());
+    }
+
+    /**
+     * Capitalizes the first letter of a string.
+     *
+     * @param str The input string to be capitalized.
+     * @return The string with the first letter capitalized.
+     */
+    private static String capitalize(String str) {
+        // Capitalize the first letter using substring
+        return str.substring(0, 1).toUpperCase() + str.substring(1);
+    }
+
 }
