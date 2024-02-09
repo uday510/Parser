@@ -44,7 +44,6 @@ To generate Java models from a Swagger JSON file, add the following dependency t
 ## Contributors
 - [Uday](https://github.com/uday510)
 - [SamSi](https://github.com/Sam-Si)
-- 
 ## License
 
 This project is licensed under the Apache License, Version 2.0. See the [LICENSE](LICENSE) file for details.
