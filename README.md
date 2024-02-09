@@ -37,7 +37,7 @@ To generate Java models from a Swagger JSON file, add the following dependency t
 <dependency>
     <groupId>com.example</groupId>
     <artifactId>swagger-to-java-models</artifactId>
-    <version>1.0.0</version> <!-- Replace with the actual version -->
+    <version>1.0.0</version> 
 </dependency>
 ```
 
