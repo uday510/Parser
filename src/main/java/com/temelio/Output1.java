@@ -1,7 +1,7 @@
 package org.com;
 import java.util.*;
 
-public class Output {
+public class Output1 {
     public static void main(String[] args) {
 
     }
