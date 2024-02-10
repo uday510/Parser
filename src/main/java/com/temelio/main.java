@@ -13,11 +13,12 @@ import java.util.Iterator;
 import java.util.Map;
 
 public class Main {
+    private static final String ANSI_GREEN = "\u001B[32m";
     public static void main(String[] args) {
        try {
 
            // Swagger first JSON file path
-            String swaggerJsonPath = Util.SWAGGER_FILE_PATH;
+            String swaggerJsonPath = Util.SWAGGER_FILE_PATH_2;
             String outputFilePath = Util.OUTPUT_FILE_PATH;
 
             // Read the swagger.json file and generate the models
@@ -29,7 +30,7 @@ public class Main {
             // Write the models to a file
            writeToFile(outputFilePath, models);
 
-           System.out.println("Models generated successfully");
+           System.out.println(ANSI_GREEN + "Models generated successfully");
 
        } catch (IOException e) {
            System.err.println("Error: " + e.getMessage());
@@ -55,12 +56,23 @@ public class Main {
         // Parse the swagger.json and generate the models
         StringBuilder models = new StringBuilder();
 
-        String[] classes = Util.SWAGGER_JSON;
+        String[] classes = Util.SWAGGER_JSON_2;
+
+        // Generate package statement
+        models.append("package com.temelio;\n\n");
+
+        // Generate import statements
+        models.append("import java.util.*;\n\n");
+        // create base class
+        models.append("public class Output {\n\n");
 
         // Generate models for each class
         for (String className : classes) {
             generateClassModels(jsonNode, className, models);
         }
+
+        // Close the base class
+        models.append("}\n");
 
         return models.toString();
     }
@@ -75,7 +87,7 @@ public class Main {
         }
 
         // Generate class declaration
-        models.append("public class ").append(className).append(" {\n");
+        models.append("public static class ").append(className).append(" {\n");
 
         // Generate fields for each property
         JsonNode propertiesNode = definitionNode.path("properties");

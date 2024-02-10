@@ -1,0 +1,334 @@
+{
+  "swagger" : "2.0",
+  "info" : { },
+  "schemes" : [ "http" ],
+  "paths" : {
+    "/nonprofits" : {
+      "get" : {
+        "operationId" : "getNonProfits",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "application/json" ],
+        "parameters" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "headers" : { },
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/Nonprofit"
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "operationId" : "createNonprofit",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/Nonprofit"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "headers" : { },
+            "schema" : {
+              "type" : "integer",
+              "format" : "int32"
+            }
+          }
+        }
+      }
+    },
+    "/nonprofits/{id}/submissions" : {
+      "get" : {
+        "operationId" : "getSubmissions",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "type" : "integer",
+          "format" : "int32"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "headers" : { },
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/GrantSubmission"
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "operationId" : "createSubmission",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "type" : "integer",
+          "format" : "int32"
+        }, {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/GrantSubmission"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "headers" : { },
+            "schema" : {
+              "type" : "integer",
+              "format" : "int32"
+            }
+          }
+        }
+      }
+    },
+    "/nonprofits/{id}" : {
+      "get" : {
+        "operationId" : "getNonprofitById",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "type" : "integer",
+          "format" : "int32"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "headers" : { },
+            "schema" : {
+              "$ref" : "#/definitions/Nonprofit"
+            }
+          }
+        }
+      },
+      "put" : {
+        "operationId" : "updateNonprofit",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "type" : "integer",
+          "format" : "int32"
+        }, {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/Nonprofit"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "headers" : { },
+            "schema" : {
+              "$ref" : "#/definitions/Nonprofit"
+            }
+          }
+        }
+      }
+    },
+    "/nonprofits/submissions" : {
+      "get" : {
+        "operationId" : "grantSubmissionList",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "application/json" ],
+        "parameters" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "headers" : { },
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "type" : "array",
+                "items" : {
+                  "$ref" : "#/definitions/GrantSubmission"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/nonprofits/{nonprofitId}/submissions/{submissionId}" : {
+      "get" : {
+        "operationId" : "getSubmissionByNonprofitId",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "nonprofitId",
+          "in" : "path",
+          "required" : true,
+          "type" : "integer",
+          "format" : "int32"
+        }, {
+          "name" : "submissionId",
+          "in" : "path",
+          "required" : true,
+          "type" : "integer",
+          "format" : "int32"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "headers" : { },
+            "schema" : {
+              "$ref" : "#/definitions/GrantSubmission"
+            }
+          }
+        }
+      },
+      "put" : {
+        "operationId" : "updateSubmissionByNonprofitId",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "nonprofitId",
+          "in" : "path",
+          "required" : true,
+          "type" : "integer",
+          "format" : "int32"
+        }, {
+          "name" : "submissionId",
+          "in" : "path",
+          "required" : true,
+          "type" : "integer",
+          "format" : "int32"
+        }, {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/GrantSubmission"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "headers" : { },
+            "schema" : {
+              "$ref" : "#/definitions/GrantSubmission"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions" : {
+    "Address" : {
+      "type" : "object",
+      "properties" : {
+        "street" : {
+          "type" : "string"
+        },
+        "city" : {
+          "type" : "string"
+        },
+        "state" : {
+          "type" : "string"
+        },
+        "zip" : {
+          "type" : "string"
+        }
+      }
+    },
+    "Duration" : {
+      "type" : "object",
+      "properties" : {
+        "grantStart" : {
+          "type" : "string"
+        },
+        "grantEnd" : {
+          "type" : "string"
+        }
+      }
+    },
+    "GrantSubmission" : {
+      "type" : "object",
+      "properties" : {
+        "nonprofitId" : {
+          "type" : "integer",
+          "format" : "int32"
+        },
+        "id" : {
+          "type" : "integer",
+          "format" : "int32"
+        },
+        "grantName" : {
+          "type" : "string"
+        },
+        "requestedAmount" : {
+          "type" : "string"
+        },
+        "awardedAmount" : {
+          "type" : "string"
+        },
+        "grantType" : {
+          "type" : "string",
+          "enum" : [ "OPERATING_GRANT", "PROJECT_GRANT", "OTHER" ]
+        },
+        "tags" : {
+          "type" : "array",
+          "items" : {
+            "type" : "string"
+          }
+        },
+        "duration" : {
+          "$ref" : "#/definitions/Duration"
+        }
+      }
+    },
+    "Nonprofit" : {
+      "type" : "object",
+      "properties" : {
+        "legalName" : {
+          "type" : "string"
+        },
+        "ein" : {
+          "type" : "string"
+        },
+        "mission" : {
+          "type" : "string"
+        },
+        "address" : {
+          "$ref" : "#/definitions/Address"
+        },
+        "id" : {
+          "type" : "integer",
+          "format" : "int32"
+        },
+        "grantSubmissions" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/GrantSubmission"
+          }
+        }
+      }
+    }
+  }
+}

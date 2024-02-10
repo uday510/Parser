@@ -3,12 +3,14 @@ package com.temelio;
 public class Util {
 
     // Swagger JSON file path
-    static String SWAGGER_FILE_PATH = "/Users/uday/Downloads/Temelio/swagger1.json";
-    static String OUTPUT_FILE_PATH = "/Users/uday/Downloads/Temelio/output1.java";
+    static String SWAGGER_FILE_PATH_1 = "/Users/uday/Desktop/Assignment/problem1/src/main/java/com/temelio/swagger1.json";
+    static String SWAGGER_FILE_PATH_2 = "/Users/uday/Desktop/Assignment/problem1/src/main/java/com/temelio/swagger2.json";
+
+    static String OUTPUT_FILE_PATH = "/Users/uday/Desktop/Assignment/problem1/src/main/java/com/temelio/Output.java";
 
 
     // for first swagger.json file
-    static String[] SWAGGER_JSON = {
+    static String[] SWAGGER_JSON_1 = {
             "Nonprofit", "Address", "FiscalSponsor", "NonprofitAdditionalInfo", "NonprofitIRSData", "NonprofitMetadata",
             "OfacFlags", "OfacSdn", "PlaidData", "DeleteFileInfo", "Foundation", "FoundationUser", "NonprofitUser",
             "PresignedFile", "UploadedFile", "UserFoundationRole", "UserNonprofitRole", "AppUser", "NylasSyncRequest",
@@ -126,5 +128,5 @@ public class Util {
     };
 
     // for second swagger.json file
-//    static String[] SWAGGER_JSON  = {"Address", "Duration", "GrantSubmission", "Nonprofit"};
+    static String[] SWAGGER_JSON_2  = {"Address", "Duration", "GrantSubmission", "Nonprofit"};
 }
