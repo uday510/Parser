@@ -59,9 +59,12 @@ public class Main {
         String[] classes = null;
 
         // get the classes from the json
+
         if (jsonNode.get("definitions") != null) {
+            // Get the class names from the definitions node, if it exists in the JSON
             classes = new String[jsonNode.get("definitions").size()];
             int i = 0;
+            // Iterate through the class names and add them to the array
             for (Iterator<String> it = jsonNode.get("definitions").fieldNames(); it.hasNext(); i++) {
                 classes[i] = it.next();
             }
