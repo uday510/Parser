@@ -13,13 +13,13 @@ import java.util.Iterator;
 import java.util.Map;
 
 public class Main {
-    private static final String ANSI_GREEN = "\u001B[32m";
+
     public static void main(String[] args) {
        try {
 
            // Swagger first JSON file path
-            String swaggerJsonPath = Util.SWAGGER_FILE_PATH_2;
-            String outputFilePath = Util.OUTPUT_FILE_PATH;
+            String swaggerJsonPath = null; // swagger.json file path goes here
+            String outputFilePath = null; // output file path goes here
 
             // Read the swagger.json file and generate the models
             String swaggerJson = readSwaggerJson(swaggerJsonPath);
@@ -30,7 +30,7 @@ public class Main {
             // Write the models to a file
            writeToFile(outputFilePath, models);
 
-           System.out.println(ANSI_GREEN + "Models generated successfully");
+           System.out.println("Models generated successfully");
 
        } catch (IOException e) {
            System.err.println("Error: " + e.getMessage());
@@ -56,7 +56,16 @@ public class Main {
         // Parse the swagger.json and generate the models
         StringBuilder models = new StringBuilder();
 
-        String[] classes = Util.SWAGGER_JSON_2;
+        String[] classes = null;
+
+        // get the classes from the json
+        if (jsonNode.get("definitions") != null) {
+            classes = new String[jsonNode.get("definitions").size()];
+            int i = 0;
+            for (Iterator<String> it = jsonNode.get("definitions").fieldNames(); it.hasNext(); i++) {
+                classes[i] = it.next();
+            }
+        }
 
         // Generate package statement
         models.append("package com.temelio;\n\n");
@@ -64,7 +73,7 @@ public class Main {
         // Generate import statements
         models.append("import java.util.*;\n\n");
         // create base class
-        models.append("public class Output2 {\n\n");
+        models.append("public class Output {\n\n");
 
         // Generate models for each class
         for (String className : classes) {

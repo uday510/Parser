@@ -4,6 +4,8 @@ import java.util.*;
 
 public class Output2 {
 
+
+
 public static class Address {
     private String street;
     private String city;
