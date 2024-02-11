@@ -64,7 +64,7 @@ public class Main {
         // Generate import statements
         models.append("import java.util.*;\n\n");
         // create base class
-        models.append("public class Output {\n\n");
+        models.append("public class Output2 {\n\n");
 
         // Generate models for each class
         for (String className : classes) {

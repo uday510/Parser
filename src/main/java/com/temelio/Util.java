@@ -6,7 +6,7 @@ public class Util {
     static String SWAGGER_FILE_PATH_1 = "/Users/uday/Desktop/Assignment/problem1/src/main/java/com/temelio/swagger1.json";
     static String SWAGGER_FILE_PATH_2 = "/Users/uday/Desktop/Assignment/problem1/src/main/java/com/temelio/swagger2.json";
 
-    static String OUTPUT_FILE_PATH = "/Users/uday/Desktop/Assignment/problem1/src/main/java/com/temelio/Output.java";
+    static String OUTPUT_FILE_PATH = "/Users/uday/Desktop/Assignment/problem1/src/main/java/com/temelio/Output2.java";
 
 
     // for first swagger.json file
